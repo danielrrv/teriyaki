@@ -3,11 +3,11 @@
 #include <fstream>
 #include<cstring>
 #include "TeriyakiConfig.h"
+#include "Scanner.cpp"
 
 
 
-
-#define BUFFERSIZE 1024
+#define BUFFERSIZE 1024*10
 
 inline void runFile(std::string path){
   std::ifstream file(path , std::ifstream::in);
@@ -16,9 +16,9 @@ inline void runFile(std::string path){
     
     file.read(buffer, BUFFERSIZE);
     if(file.gcount() > 0){
-      std::cout<< buffer <<std::endl;
+      Scanner scanner(buffer);
+      scanner.scanTokens();
     }
-
   } while(!file.eof()&&!file.fail());
 }
 inline void runPrompt(){
