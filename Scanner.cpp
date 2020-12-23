@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <regex>
 #include "Token.cpp"
 #include "TokenType.h"
@@ -9,7 +10,7 @@ class Scanner
 {
 
 private:
-	int start = 0;
+
 	int current = 0;
 	int line = 1;
 	int column;
@@ -31,28 +32,33 @@ public:
 		}
 	}
 	//TODO:: Call the Destructor.
-	Scanner(std::string _source) : source(_source) { std::cout << "Object created" << std::endl; }
+	Scanner(const std::string& _source) : source(_source) { std::cout << "Object created" << std::endl; }
 	~Scanner(){};
 	std::vector<IToken::Token> scanTokens()
 	{
 		while (!isAtEnd())
 		{
 			// We are at the beginning of the next lexeme.
-			start = current;
-			scanToken();
+		
+		
+		
+			char c = charAtCurrent();
+			scanToken(c);
+			//current++;
 		}
 
 		return tokens;
 	}
-	char advance()
+	void move(){;current ++;}
+
+	char charAtCurrent()
 	{
-		current++;
 		column++;
-		return source[current - 1];
+		return source[current];
 	}
-	void scanToken()
+	void scanToken(const char &c)
 	{
-		char c = advance();
+		
 		switch (c)
 		{
 		case '(':
@@ -105,7 +111,7 @@ public:
 			{
 				// A comment goes until the end of the line.
 				while (source[current] != '\n' && !isAtEnd())
-					advance();
+					move();
 			}
 			else
 			{
@@ -114,46 +120,46 @@ public:
 			break;
 		case ' ':
 		case '\r':
-		case '\v':
 		case '\t':
 			// Ignore whitespace.
 			break;
 		case '\n':
-			std::cout<<"nueva linea"<<std::endl;
 			line++;
 			column = 0;
 			break;
-		//case '"':
-		//	string();
-		//	break;
+		case '"':
+			string();
+			break;
 		default:
 			std::cerr << "Lines: " << line << ":" << column << "\t"
-					  << "Error " << source[current] << ": "
-					  << "Unexpected Token" << std::endl;
+					  << "Error " << (int)source[current] << ":" << source[current] << ": "
+					  << "Unexpected Token" << '\n';
 			break;
 		}
+		 move();
 	}
 
 	void addToken(TokenType type)
 	{
-		std::string text = source.substr(start, 1);
+		std::string text = source.substr(current,1);
 		tokens.push_back(IToken::Token(type, text, "", line));
 	}
 
 	void addToken(TokenType type, std::string literal)
 	{
-		std::string text = source.substr(current, 1);
+		std::string text = source.substr(current,1);
 		tokens.push_back(IToken::Token(type, text, literal, line));
 	}
 
 	void string()
 	{
-
+		int start = current;
+		//printf(start);
+		move();
 		while (source[current] != '"' && !isAtEnd())
 		{
-			if (source[current] == '\n')
-				line++;
-			advance();
+			if (source[current] == '\n')line++;
+			
 
 			if (isAtEnd())
 			{
@@ -163,12 +169,12 @@ public:
 			}
 
 			// The closing ".
-			advance();
+			move();
 
 			// Trim the surrounding quotes.
 			//std::string value = "sdasd";
-			std::string value = source.substr(start + 1, current - 1);
-			addToken(STRING, value);
 		}
+			std::string value = source.substr(start, (current+1) - start);	
+			addToken(STRING, value);
 	}
 };
