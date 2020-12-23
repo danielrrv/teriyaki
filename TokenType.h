@@ -15,9 +15,11 @@
 		DOT,
 		MINUS,
 		PLUS,
+		COLON,
 		SEMICOLON,
 		SLASH,
 		STAR,
+		UNDERSCORE,
 
 		// One or two character tokens.
 		BANG,

@@ -9,6 +9,8 @@
 
 #define BUFFERSIZE 1024*10
 
+
+
 inline void runFile(std::string path){
   std::ifstream file(path , std::ifstream::in);
   char buffer[BUFFERSIZE];
@@ -18,6 +20,7 @@ inline void runFile(std::string path){
     if(file.gcount() > 0){
       Scanner scanner(buffer);
       scanner.scanTokens();
+      scanner.toString();
     }
   } while(!file.eof()&&!file.fail());
 }
@@ -31,6 +34,14 @@ inline void runPrompt(){
     std::cout<<line<<std::endl;
   }
 }
+
+  inline void report(int line, std::string where, std::string message) {
+    std::cerr<< "[line " << line << "] Error at " << where << ": " << message<<std::endl;
+  }
+
+  inline void error(int line, std::string message) {
+    report(line, "", message);
+  }
 
 int main(int argc, char* argv[]){
 
