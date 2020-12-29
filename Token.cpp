@@ -24,6 +24,10 @@ namespace IToken
 		{
 			return m_lexeme;
 		}
+
+		std::string getLiteral(){
+			return m_literal;
+		}
 		std::string getLexeme() const{
 			return m_lexeme;
 		}

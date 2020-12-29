@@ -7,6 +7,7 @@
 	enum TokenType
 	{
 		// Single-character tokens.
+		IDENTIFIER,
 		LEFT_PAREN,
 		RIGHT_PAREN,
 		LEFT_BRACE,
@@ -32,7 +33,7 @@
 		LESS_EQUAL,
 
 		// Literals.
-		IDENTIFIER,
+		
 		STRING,
 		NUMBER,
 
@@ -52,7 +53,8 @@
 		THIS,
 		TRUE,
 		VAR,
-		WHILE
+		WHILE,
+		CONST,
 	};
 
 

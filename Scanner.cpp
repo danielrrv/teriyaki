@@ -3,19 +3,41 @@
 #include <iostream>
 #include <iomanip>
 #include <regex>
+
 #include "Token.cpp"
 #include "TokenType.h"
+
+template <typename T>
+void print(T &s)
+{
+	std::cout << " " << s << '\n';
+}
+template <typename T>
+void print(T &&s)
+{
+	std::cout << " " << s << '\n';
+}
 
 class Scanner
 {
 
 private:
-
 	int current = 0;
 	int line = 1;
 	int column;
 	std::string source;
 	std::vector<IToken::Token> tokens;
+	std::map<std::string, TokenType> keywords = {
+		{"if", IF},
+		{"for", FOR},
+		{"while", WHILE},
+		{"if", IF},
+		{"for", FOR},
+		{"while", WHILE},
+		{"class", CLASS},
+		{"const", CONST},
+		{"or", OR},
+		{"and", AND}};
 
 protected:
 	bool isAtEnd()
@@ -30,26 +52,33 @@ public:
 		{
 			std::cout << "Token: " << tokens[i].getLexeme() << "\n";
 		}
+		std::cout << "-----------" << std::endl;
+		for (int i = 0; i < tokens.size(); i++)
+		{
+			print(tokens[i].getLiteral());
+		}
 	}
 	//TODO:: Call the Destructor.
-	Scanner(const std::string& _source) : source(_source) { std::cout << "Object created" << std::endl; }
+	Scanner(const std::string &_source) : source(_source) { std::cout << "Object created" << std::endl; }
 	~Scanner(){};
 	std::vector<IToken::Token> scanTokens()
 	{
 		while (!isAtEnd())
 		{
-			// We are at the beginning of the next lexeme.
-		
-		
-		
 			char c = charAtCurrent();
 			scanToken(c);
-			//current++;
 		}
-
 		return tokens;
 	}
-	void move(){;current ++;}
+	bool move()
+	{
+		if (isAtEnd())
+		{
+			return false;
+		}
+		current++;
+		return true;
+	}
 
 	char charAtCurrent()
 	{
@@ -58,7 +87,7 @@ public:
 	}
 	void scanToken(const char &c)
 	{
-		
+
 		switch (c)
 		{
 		case '(':
@@ -128,53 +157,96 @@ public:
 			column = 0;
 			break;
 		case '"':
+			addToken(STRING);
 			string();
 			break;
 		default:
-			std::cerr << "Lines: " << line << ":" << column << "\t"
-					  << "Error " << (int)source[current] << ":" << source[current] << ": "
-					  << "Unexpected Token" << '\n';
-			break;
+			if (isNumber())
+			{
+				number();
+				break;
+			}
+			else if (isAlpha())
+			{
+				identifier();
+				break;
+			}
+			else
+			{
+				std::cerr << "Lines: " << line << ":" << column << "\t"
+						  << "Error " << (int)source[current] << ":" << source[current] << ": "
+						  << "Unexpected Token" << '\n';
+				break;
+			}
 		}
-		 move();
+		move();
+	}
+
+	void identifier()
+	{
+		int start = current;
+		std::map<std::string,TokenType>::iterator it;
+		while (isAlphaNumeric() && move())
+			;
+		std::string text = source.substr(start, current - start);
+		it = keywords.find(text);
+		TokenType type = IDENTIFIER;
+		if(it!=keywords.end()){
+			type = keywords.at(text);
+		}
+		addToken(type, text);
+	}
+	bool isNumber()
+	{
+		return source[current] >= '0' && source[current] <= '9';
+	}
+	bool isAlpha()
+	{
+		return (source[current] >= 'a' && source[current] <= 'z') ||
+			   (source[current] >= 'A' && source[current] <= 'Z') ||
+			   source[current] == '_';
+	}
+	bool isAlphaNumeric()
+	{
+		return isAlpha() || isNumber();
+	}
+	void number()
+	{
+		int start = current;
+		while (isNumber())
+			move();
+		if (source[current] == '.' && move())
+		{
+			while (isNumber() && move())
+				;
+		}
+		std::string value = source.substr(start, (current + 1) - start);
+		addToken(NUMBER, value);
 	}
 
 	void addToken(TokenType type)
 	{
-		std::string text = source.substr(current,1);
+		std::string text = source.substr(current, 1);
 		tokens.push_back(IToken::Token(type, text, "", line));
 	}
 
 	void addToken(TokenType type, std::string literal)
 	{
-		std::string text = source.substr(current,1);
+		std::string text = source.substr(current, 1);
 		tokens.push_back(IToken::Token(type, text, literal, line));
 	}
 
 	void string()
 	{
 		int start = current;
-		//printf(start);
-		move();
-		while (source[current] != '"' && !isAtEnd())
+
+		while (source[current] != '"' && move())
 		{
-			if (source[current] == '\n')line++;
-			
-
-			if (isAtEnd())
-			{
-				std::cerr << line << ":" << current << '\t' << "Error " << source[current] << ": "
-						  << "Unexpected Token" << std::endl;
-				return;
-			}
-
-			// The closing ".
-			move();
-
-			// Trim the surrounding quotes.
-			//std::string value = "sdasd";
+			if (source[current] == '\n')
+				line++;
 		}
-			std::string value = source.substr(start, (current+1) - start);	
-			addToken(STRING, value);
+		std::string value = source.substr(start, (current + 1) - start);
+
+		addToken(STRING, value);
 	}
 };
