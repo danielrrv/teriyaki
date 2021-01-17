@@ -21,6 +21,8 @@
 		SLASH,
 		STAR,
 		UNDERSCORE,
+		INTERROGATION,
+		HUIT,
 
 		// One or two character tokens.
 		BANG,

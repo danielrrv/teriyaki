@@ -3,7 +3,7 @@
 #include <fstream>
 #include <cstring>
 #include "TeriyakiConfig.h"
-#include "Scanner.cpp"
+#include "lib/Scanner.cpp"
 
 #define BUFFERSIZE 1024 * 10
 

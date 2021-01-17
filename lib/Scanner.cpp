@@ -6,6 +6,7 @@
 
 #include "Token.cpp"
 #include "TokenType.h"
+#include "error.h"
 
 template <typename T>
 void print(T &s)
@@ -25,6 +26,7 @@ private:
 	int current = 0;
 	int line = 1;
 	int column;
+	ErrorReporter reporter;
 	std::string source;
 	std::vector<IToken::Token> tokens;
 	std::map<std::string, TokenType> keywords = {
@@ -132,6 +134,12 @@ public:
 		case '<':
 			addToken(c == '=' ? LESS_EQUAL : LESS);
 			break;
+		case '&':
+			addToken(HUIT);
+			break;
+		case '?':
+			addToken(INTERROGATION);
+			break;
 		case '>':
 			addToken(c == '=' ? GREATER_EQUAL : GREATER);
 			break;
@@ -185,14 +193,19 @@ public:
 	void identifier()
 	{
 		int start = current;
-		std::map<std::string,TokenType>::iterator it;
+		std::map<std::string, TokenType>::iterator it;
 		while (isAlphaNumeric() && move())
 			;
 		std::string text = source.substr(start, current - start);
 		it = keywords.find(text);
 		TokenType type = IDENTIFIER;
-		if(it!=keywords.end()){
+		if (it != keywords.end())
+		{
 			type = keywords.at(text);
+		}
+		else
+		{
+			reporter.report(text, line, column, "Unexpected token:");
 		}
 		addToken(type, text);
 	}
@@ -239,7 +252,6 @@ public:
 	void string()
 	{
 		int start = current;
-
 		while (source[current] != '"' && move())
 		{
 			if (source[current] == '\n')
