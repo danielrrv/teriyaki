@@ -5,7 +5,7 @@
 #include <regex>
 
 #include "Token.c"
-#include "TokenType.h"
+// #include "TokenType.h"
 #include "error.h"
 
 template <typename T>
