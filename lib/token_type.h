@@ -1,10 +1,7 @@
 
 #ifndef __TOKEN_TYPE__
 #define __TOKEN_TYPE__
-
-
-
-	enum TokenType
+	typedef enum TokenType
 	{
 		// Single-character tokens.
 		IDENTIFIER,
@@ -57,7 +54,7 @@
 		VAR,
 		WHILE,
 		CONST,
-	};
+	} TOKEN_TYPE;
 
 
 #endif /*_TOKEN_TYPE_*/

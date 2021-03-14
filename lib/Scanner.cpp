@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <regex>
 
-#include "Token.cpp"
+#include "Token.c"
 #include "TokenType.h"
 #include "error.h"
 
