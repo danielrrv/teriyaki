@@ -21,19 +21,19 @@ bool is_at_end(const Scanner *scanner)
 }
 void to_string(const Scanner *scanner)
 {
-
-    for (int i = 0; i < sizeof(scanner->tokens) / sizeof(Token *); i++)
+    int len  = *(scanner->tokens + 1) - scanner->tokens;
+    for (int i = 0; i < len ; i++)
     {
         printf("Token:%s\n", getLexeme(scanner->tokens[i]));
     }
     printf("%s\n", "-----------");
-    for (int i = 0; i < sizeof(scanner->tokens) / sizeof(Token *); i++)
+    for (int i = 0; i < len; i++)
     {
         printf("%s\n", getLiteral(scanner->tokens[i]));
     }
 }
 
-bool move(Scanner *scanner)
+static bool move(Scanner *scanner)
 {
     if (is_at_end(scanner))
     {

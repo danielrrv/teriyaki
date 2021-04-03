@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project(Teriyaki VERSION 1.0)
 
-configure_file(./lib/TeriyakiConfig.h.in ./lib/TeriyakiConfig.h)
 
 #Define the entry point
 add_executable(${PROJECT_NAME} main.cpp)
