@@ -6,6 +6,9 @@ add_library(scanner-token
   token.c
   scanner.h
   token.h
+  init.c
+  init.h
+  token_type.h
 )
 
 

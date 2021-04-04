@@ -1,9 +1,10 @@
-
+#ifndef SCANNER_H_
+#define SCANNER_H_
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include "Token.h"
+#include "token.h"
 
 typedef struct keyword
 {
@@ -38,3 +39,4 @@ void p_number(Scanner *);
 void add_token_with_lexeme(TOKEN_TYPE, char *, Scanner *);
 void add_token_with_literal(TOKEN_TYPE, char *, Scanner *);
 void p_string(Scanner *);
+#endif //SCANNER_H_

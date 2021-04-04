@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "scanner.h"
-#include "token_type.h"
+#include "token.h"
 #include "token_type.h"
 struct Keyword
 {
@@ -248,12 +248,12 @@ void scan_token(char c, Scanner *scanner)
         }
         else
         {
-            printf("Lines: %d:%d\tError%s :%s:Unexpected Token\n ",
-                   scanner->line,
-                   scanner->column,
-                   (int)scanner->source[scanner->current],
-                   scanner->source[scanner->current]);
-            break;
+            // printf("Lines: %d:%d\tError%s :%s:Unexpected Token\n ",
+            //        scanner->line,
+            //        scanner->column,
+            //        (int)scanner->source[scanner->current],
+            //        scanner->source[scanner->current]);
+            // break;
         }
     }
     move(scanner);

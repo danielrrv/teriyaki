@@ -7,12 +7,12 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-include_directories(.)
+
 add_subdirectory(src)
 add_subdirectory(lib)
 add_subdirectory(test)
 
-
+include_directories(.)
 include_directories(src)
 include_directories(lib)
 include_directories(test)
