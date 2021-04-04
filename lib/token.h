@@ -9,7 +9,7 @@ typedef struct
     int m_line;
 } Token;
 
-Token *c_token(TOKEN_TYPE *, char *, char *, int);
+Token *c_token(TOKEN_TYPE, char *, char *, int);
 char *toString(Token *);
 char *getLiteral(Token *);
 char *getLexeme(Token *);

@@ -1,3 +1,0 @@
-// the configured options and settings for Teriyaki
-#define Teriyaki_VERSION_MAJOR @Teriyaki_VERSION_MAJOR@
-#define Teriyaki_VERSION_MINOR @Teriyaki_VERSION_MINOR@

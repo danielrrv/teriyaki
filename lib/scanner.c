@@ -1,9 +1,31 @@
-#include "scanner.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
+#include "scanner.h"
+#include "token_type.h"
+#include "token_type.h"
+struct Keyword
+{
+    char *name;
+
+    TOKEN_TYPE token_type;
+};
+
+struct Keyword keywords[] = {
+    {"if", IF},
+    {"for", FOR},
+    {"while", WHILE},
+    {"if", IF},
+    {"for", FOR},
+    {"while", WHILE},
+    {"class", CLASS},
+    {"const", CONST},
+    {"or", OR},
+    {"and", AND}};
 
 Scanner *_scanner(const char *source)
 {
+    printf("%s", source);
     Scanner *scanner = (Scanner *)malloc(sizeof(Scanner));
     scanner->source = (char *)malloc(sizeof(source));
     scanner->len = 0;
@@ -11,8 +33,19 @@ Scanner *_scanner(const char *source)
     scanner->line = 0;
     scanner->current = 0;
     scanner->tokens = NULL;
-    memcpy(scanner->source, source, sizeof(source));
+    memcpy(scanner->source, source, sizeof(*source));
     return scanner;
+}
+
+void scan(Scanner *scanner)
+{
+    printf("%s", scanner->source);
+    // while (!is_at_end(scanner))
+    // {
+    //     char character = scanner->source[scanner->current];
+    //     scan_token(character, scanner);
+    // }
+    // return scanner->tokens;
 }
 
 bool is_at_end(const Scanner *scanner)
@@ -21,8 +54,9 @@ bool is_at_end(const Scanner *scanner)
 }
 void to_string(const Scanner *scanner)
 {
-    int len  = *(scanner->tokens + 1) - scanner->tokens;
-    for (int i = 0; i < len ; i++)
+    // int len  = *(scanner->tokens + 1) - scanner->tokens;
+    int len = sizeof(scanner->tokens) / sizeof(Token *);
+    for (int i = 0; i < len; i++)
     {
         printf("Token:%s\n", getLexeme(scanner->tokens[i]));
     }
@@ -33,7 +67,7 @@ void to_string(const Scanner *scanner)
     }
 }
 
-static bool move(Scanner *scanner)
+bool move(Scanner *scanner)
 {
     if (is_at_end(scanner))
     {
@@ -48,7 +82,8 @@ char char_at_current(Scanner *scanner)
     ((*scanner).column)++;
     return scanner->source[scanner->current];
 }
-void add_token(TOKEN_TYPE token_type, char *lexeme, char *literal, Scanner *scanner)
+
+void add_token_with_lexeme(TOKEN_TYPE token_type, char *lexeme, Scanner *scanner)
 {
     int len = ++(scanner->len);
     Token *token = c_token(token_type, lexeme, NULL, scanner->line);
@@ -56,61 +91,124 @@ void add_token(TOKEN_TYPE token_type, char *lexeme, char *literal, Scanner *scan
     more[len - 1] = token;
     scanner->tokens = more;
 }
-
-void scan_token(const char c, Scanner *scanner)
+void add_token_with_literal(TOKEN_TYPE token_type, char *literal, Scanner *scanner)
 {
+    int len = ++(scanner->len);
+    Token *token = c_token(token_type, NULL, literal, scanner->line);
+    Token **more = (Token **)realloc(scanner->tokens, len);
+    more[len - 1] = token;
+    scanner->tokens = more;
+}
+void p_number(Scanner *scanner)
+{
+    int start = scanner->current;
+    while (isdigit(scanner->source[scanner->current]))
+        move(scanner);
+    if (scanner->source[scanner->current] == '.' && move(scanner))
+    {
+        while (isdigit(scanner->source[scanner->current]) && move(scanner))
+            ;
+    }
+    //FIXME: unsafe operation.
+    char value[55];
+    memcpy(value, &scanner->source[scanner->current], scanner->current - start);
+    add_token_with_lexeme(NUMBER, value, scanner);
+}
+bool is_number(char number)
+{
+    return number >= '0' && number <= '9';
+}
+
+void p_string(Scanner *scanner)
+{
+    int start = scanner->current;
+    while (scanner->source[scanner->current] != '"' && move(scanner))
+    {
+        if (scanner->source[scanner->current] == '\n')
+            ((*scanner).line)++;
+    }
+    char value[255];
+    memcpy(value, &scanner->source[scanner->current], scanner->current - start);
+    add_token_with_literal(STRING, value, scanner);
+}
+
+bool p_identifier(Scanner *scanner)
+{
+    int start = scanner->current;
+    while (isalnum(scanner->source[scanner->current]) && move(scanner))
+        ;
+    char text[55];
+    memcpy(text, &scanner->source[scanner->current], scanner->current - start);
+    for (int i = 0; i < sizeof(keywords); i++)
+    {
+        int rx = strncmp(text, keywords[i].name, sizeof(text));
+        if (rx == 0)
+        {
+            add_token_with_literal(IDENTIFIER, keywords[i].name, scanner);
+            return true;
+        }
+    }
+    return false;
+}
+
+void scan_token(char c, Scanner *scanner)
+{
+    char local_char[8];
+    memset(local_char, '\0', 8);
+    local_char[0] = c;
     switch (c)
     {
     case '(':
-        add_token(LEFT_PAREN);
+
+        add_token_with_lexeme(LEFT_PAREN, local_char, scanner);
         break;
     case ')':
-        add_token(RIGHT_PAREN);
+        add_token_with_lexeme(RIGHT_PAREN, local_char, scanner);
         break;
     case '{':
-        add_token(LEFT_BRACE);
+        add_token_with_lexeme(LEFT_BRACE, local_char, scanner);
         break;
     case '}':
-        add_token(RIGHT_BRACE);
+        add_token_with_lexeme(RIGHT_BRACE, local_char, scanner);
         break;
     case ',':
-        add_token(COMMA);
+        add_token_with_lexeme(COMMA, local_char, scanner);
         break;
     case '.':
-        add_token(DOT);
+        add_token_with_lexeme(DOT, local_char, scanner);
         break;
     case '-':
-        add_token(MINUS);
+        add_token_with_lexeme(MINUS, local_char, scanner);
         break;
     case '+':
-        add_token(PLUS);
+        add_token_with_lexeme(PLUS, local_char, scanner);
         break;
     case ';':
-        add_token(SEMICOLON);
+        add_token_with_lexeme(SEMICOLON, local_char, scanner);
         break;
     case ':':
-        add_token(COLON);
+        add_token_with_lexeme(COLON, local_char, scanner);
         break;
     case '*':
-        add_token(STAR);
+        add_token_with_lexeme(STAR, local_char, scanner);
         break;
     case '!':
-        add_token(c == '=' ? BANG_EQUAL : BANG);
+        add_token_with_lexeme(c == '=' ? BANG_EQUAL : BANG, local_char, scanner);
         break;
     case '=':
-        add_token(c == '=' ? EQUAL_EQUAL : EQUAL);
+        add_token_with_lexeme(c == '=' ? EQUAL_EQUAL : EQUAL, local_char, scanner);
         break;
     case '<':
-        add_token(c == '=' ? LESS_EQUAL : LESS);
+        add_token_with_lexeme(c == '=' ? LESS_EQUAL : LESS, local_char, scanner);
         break;
     case '&':
-        add_token(HUIT);
+        add_token_with_lexeme(HUIT, local_char, scanner);
         break;
     case '?':
-        add_token(INTERROGATION);
+        add_token_with_lexeme(INTERROGATION, local_char, scanner);
         break;
     case '>':
-        add_token(c == '=' ? GREATER_EQUAL : GREATER);
+        add_token_with_lexeme(c == '=' ? GREATER_EQUAL : GREATER, local_char, scanner);
         break;
     case '/':
         if (c == '/')
@@ -121,7 +219,7 @@ void scan_token(const char c, Scanner *scanner)
         }
         else
         {
-            add_token(SLASH);
+            add_token_with_lexeme(SLASH, local_char, scanner);
         }
         break;
     case ' ':
@@ -134,16 +232,16 @@ void scan_token(const char c, Scanner *scanner)
         (scanner->column) = 0;
         break;
     case '"':
-        add_token(STRING);
+        add_token_with_lexeme(STRING, local_char, scanner);
         p_string(scanner);
         break;
     default:
-        if (is_number(scanner))
+        if (is_number(scanner->source[scanner->current]))
         {
             p_number(scanner);
             break;
         }
-        else if (is_alpha(scanner))
+        else if (isalpha(scanner->source[scanner->current]))
         {
             p_identifier(scanner);
             break;
