@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+// #include <windows.h>
 #include "scanner.h"
 #include "init.h"
 
+void *Teriyaki_malloc(size_t size);
 enum
 {
 	OUTSIZE = 1024 * 80,
@@ -25,8 +27,7 @@ void run_prompt()
 
 void run_file(char *source)
 {
-	char * _source = source;
-	char * out = read_file(_source);
+	char * out = read_file(source);
 	Scanner *scanner = _scanner(out);
 	scan(scanner);
 	// to_string(scanner);
@@ -43,12 +44,11 @@ char * read_file(char * source){
 		fprintf(stderr, "Error to open file %s", filename);
 		exit(1);
 	};
-	char * out = (char *)malloc( OUTSIZE * sizeof(char));
-	while (!feof(file) || ferror(file))
-	{
+
+	char * out = (char *)Teriyaki_malloc(OUTSIZE * sizeof(char));
+	while (!feof(file) && !ferror(file)){
 		char buffer[BUFFERSIZE];
 		fgets(buffer, BUFFERSIZE, file);
-		// printf("%s", buffer);
 		strncat(out, buffer, BUFFERSIZE);
 	}
 	fclose(file);

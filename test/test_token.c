@@ -10,13 +10,12 @@
 
 void TESTCASE_read_file(char * filename){
 	char lfilename[55];
+
 	memset(lfilename, '\0', 55);
 	strncpy(lfilename, filename, 55);
-	// memcpy(lfilename, filename, 55); 
 	char * out = read_file(filename);
-	printf("%s", out);
 	assert(sizeof(out) >0);
-	free(out);
+	fprintf(stdout, "%s", out);
 }
 
 // void TESTCASE_scanner_constructor(){

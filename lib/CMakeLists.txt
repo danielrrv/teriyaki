@@ -9,6 +9,7 @@ add_library(scanner-token
   init.c
   init.h
   token_type.h
+  allocator.c
 )
 
 

@@ -8,3 +8,8 @@ add_executable(tests
 target_link_libraries(tests
 	scanner-token
 )
+
+add_custom_command(TARGET tests POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/example.txt 
+		$<TARGET_FILE_DIR:tests>
+)

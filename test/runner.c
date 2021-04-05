@@ -14,9 +14,9 @@ int main(int argc, char *argv[])
 		char filename[55];
 		memset(filename, '\0', 55);
 		strncpy(filename, argv[1], 55);
+	
 		TESTCASE_read_file(filename);
 	}
-
 	printf("All test are run successfully!");
 	// printf("None is compiling");
 	return 0;
