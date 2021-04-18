@@ -1,3 +1,3 @@
 # teriyaki
 
-Simple interpreter written in C++
+Simple interpreter written in C
