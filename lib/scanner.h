@@ -6,6 +6,13 @@
 #include <string.h>
 #include "token.h"
 
+enum
+{
+	OUTSIZE = 1024 * 80,
+	BUFFERSIZE = 80
+
+}; //*kb
+
 typedef struct keyword
 {
     char *name;
@@ -19,15 +26,15 @@ typedef struct
     int column;
     char *source;
     Token **tokens;
-    /*lenght of the token already allocated*/
     int len;
 } Scanner;
+
 Scanner *_scanner(const char *);
 void scan(Scanner *);
 bool is_at_end(const Scanner *);
 bool is_number(const char);
 bool is_alpha(const Scanner *);
-bool is_alpha_numeric(const Scanner *);
+bool is_alpha_numeric(const char c);
 void to_string(const Scanner *);
 Token *scans(void);
 bool move(Scanner *);
@@ -39,4 +46,5 @@ void p_number(Scanner *);
 void add_token_with_lexeme(TOKEN_TYPE, char *, Scanner *);
 void add_token_with_literal(TOKEN_TYPE, char *, Scanner *);
 void p_string(Scanner *);
+void report_scanner_error(char *, int, int);
 #endif //SCANNER_H_

@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void *Teriyaki_malloc(size_t size)
+void *teriyaki_malloc(size_t size)
 {
 #if defined(_WIN32)
 	return (void *)HeapAlloc(GetProcessHeap(), 0, size);

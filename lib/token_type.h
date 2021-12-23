@@ -19,7 +19,8 @@
 		STAR,
 		UNDERSCORE,
 		INTERROGATION,
-		HUIT,
+		AMPERSAND,
+		NUMERAL,
 
 		// One or two character tokens.
 		BANG,
@@ -30,6 +31,7 @@
 		GREATER_EQUAL,
 		LESS,
 		LESS_EQUAL,
+		PERCENT,
 
 		// Literals.
 		
@@ -55,6 +57,4 @@
 		WHILE,
 		CONST,
 	} TOKEN_TYPE;
-
-
 #endif /*_TOKEN_TYPE_*/
