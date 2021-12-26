@@ -1,4 +1,5 @@
-#
+#ifndef ALLOCATOR_TERIYAKI
+#define ALLOCATOR_TERIYAKI
 
 #if defined(_WIN32)
 #ifndef _WIN32_WINNT
@@ -17,3 +18,14 @@ void *teriyaki_malloc(size_t size)
 	return (void *)malloc(size);
 #endif
 }
+
+void *teriyaki_calloc(size_t num_memory, size_t size)
+{
+#if defined(_WIN32)
+	return (void *)calloc(num_memory, size);
+#else
+	return (void *)calloc(num_memory, size);
+#endif
+}
+
+#endif

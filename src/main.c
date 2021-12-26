@@ -14,8 +14,9 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	else if (argc == 2)
-	{
-		run_file(argv[1]);
+	{	uint8_t file[FILE_NAME_SIZE];
+		memcpy(file, argv[1], strlen(argv[1]));
+		run_file(file);
 	}
 	else
 	{
