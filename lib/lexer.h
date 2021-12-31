@@ -17,7 +17,7 @@ enum
 typedef struct
 {
     uint8_t *name;
-    TOKEN_TYPE type;
+    TOKEN_TYPE kind;
 } keyword_t;
 
 typedef struct
@@ -33,21 +33,20 @@ typedef struct
 typedef struct Keyword
 {
     uint8_t *name;
-
-    TOKEN_TYPE token_type;
+    TOKEN_TYPE kind;
 } keyworkd_t;
 
 keyworkd_t keywords[] = {
-    {"if", IF},
-    {"for", FOR},
-    {"while", WHILE},
-    {"if", IF},
-    {"for", FOR},
-    {"while", WHILE},
-    {"class", CLASS},
-    {"const", CONST},
-    {"or", OR},
-    {"and", AND}};
+    {(uint8_t *)"if", IF},
+    {(uint8_t *)"for", FOR},
+    {(uint8_t *)"while", WHILE},
+    {(uint8_t *)"if", IF},
+    {(uint8_t *)"for", FOR},
+    {(uint8_t *)"while", WHILE},
+    {(uint8_t *)"class", CLASS},
+    {(uint8_t *)"const", CONST},
+    {(uint8_t *)"or", OR},
+    {(uint8_t *)"and", AND}};
 
 scanner_t *_scanner(const char *source)
 {
@@ -67,20 +66,6 @@ bool is_at_end(const scanner_t *scanner)
     return (scanner->current >= strlen((char *)scanner->source));
 }
 
-void to_string(const scanner_t *scanner)
-{
-    // int len  = *(scanner->tokens + 1) - scanner->tokens;
-    int len = sizeof(scanner->tokens) / sizeof(token_t *);
-    for (int i = 0; i < len; i++)
-    {
-        printf("Token:%s\n", getLexeme(scanner->tokens[i]));
-    }
-    for (int i = 0; i < len; i++)
-    {
-        printf("%s\n", getLiteral(scanner->tokens[i]));
-    }
-}
-
 bool move(scanner_t *scanner)
 {
     if (is_at_end(scanner))
@@ -94,31 +79,21 @@ bool move(scanner_t *scanner)
 
 uint8_t char_at_current(scanner_t *scanner)
 {
-    ((*scanner).column)++;
-    return scanner->source[scanner->current];
+    return (uint8_t)scanner->source[scanner->current];
 }
 
 void add_token(TOKEN_TYPE token_type, scanner_t *scanner)
 {
-    token_t *token = c_token(token_type, NULL, NULL, scanner->line, scanner->column);
+    token_t *token = c_token(token_type, NULL, scanner->line, scanner->current, scanner->column + 1);
     token_t **new_ptr = (token_t **)realloc(scanner->tokens, (scanner->token_length + 1) * sizeof(token_t));
     new_ptr[scanner->token_length] = token;
     scanner->tokens = new_ptr;
     (scanner->token_length)++;
 }
 
-void add_token_with_lexeme(TOKEN_TYPE token_type, uint8_t *lexeme, scanner_t *scanner)
+void add_token_with_lexeme(TOKEN_TYPE token_type, uint8_t *lexeme, scanner_t *scanner, int start, int end)
 {
-    token_t *token = c_token(token_type, lexeme, NULL, scanner->line, scanner->column);
-    token_t **new_ptr = (token_t **)realloc(scanner->tokens, (scanner->token_length + 1) * sizeof(token_t));
-    new_ptr[scanner->token_length] = token;
-    scanner->tokens = new_ptr;
-    (scanner->token_length)++;
-}
-
-void add_token_with_literal(TOKEN_TYPE token_type, uint8_t *literal, scanner_t *scanner)
-{
-    token_t *token = c_token(token_type, NULL, literal, scanner->line, scanner->column);
+    token_t *token = c_token(token_type, lexeme, scanner->line, start, end);
     token_t **new_ptr = (token_t **)realloc(scanner->tokens, (scanner->token_length + 1) * sizeof(token_t));
     new_ptr[scanner->token_length] = token;
     scanner->tokens = new_ptr;
@@ -137,7 +112,7 @@ static bool is_alpha(uint8_t c)
            c == '_';
 }
 
-void p_number(scanner_t *scanner)
+void scan_number(scanner_t *scanner)
 {
     int start = scanner->current;
     while (is_digit(scanner->source[scanner->current]))
@@ -147,10 +122,9 @@ void p_number(scanner_t *scanner)
         while (is_digit(scanner->source[scanner->current]) && move(scanner))
             ;
     }
-    // FIXME: unsafe operation.
-    uint8_t value[55];
-    memcpy(value, &scanner->source[scanner->current], scanner->current - start);
-    add_token_with_lexeme(NUMBER, value, scanner);
+    uint8_t * number = (uint8_t *)teriyaki_malloc((scanner->current - start + 1)* sizeof(uint8_t));
+    memcpy(number, &scanner->source[scanner->current], scanner->current - start);
+    add_token_with_lexeme(NUMBER, number, scanner, start, scanner->current);
 }
 bool is_number(uint8_t number)
 {
@@ -162,12 +136,11 @@ bool is_alpha_numeric(const uint8_t c)
     return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || is_number(c) || c == '_');
 }
 
-void p_identifier(scanner_t *scanner)
+void scan_identifier(scanner_t *scanner)
 {
     int start = scanner->current;
     while (is_alpha_numeric(scanner->source[scanner->current + 1]))
     {
-        // printf("%d\n", scanner->source[scanner->current + 1]);
         move(scanner);
     }
     uint8_t *identifier = (uint8_t *)teriyaki_malloc((scanner->current + 1 + 1 - start) * sizeof(uint8_t));
@@ -176,14 +149,14 @@ void p_identifier(scanner_t *scanner)
     printf("start:%d\tcurrent:%d\ttext:%s\n", start, scanner->current + 1, identifier);
     for (int i = 0; i < (sizeof(keywords) / sizeof(keyworkd_t)); i++)
     {
-        int rx = strncmp((char *)identifier, keywords[i].name, strlen((char *)identifier));
+        int rx = strncmp((char *)identifier, (char *)keywords[i].name, strlen((char *)identifier));
         if (rx == 0)
         {
-            add_token_with_lexeme(keywords[i].token_type, keywords[i].name, scanner);
+            add_token_with_lexeme(keywords[i].kind, keywords[i].name, scanner, start, scanner->current);
             return;
         }
     }
-    add_token_with_lexeme(IDENTIFIER, identifier, scanner);
+    add_token_with_lexeme(IDENTIFIER, identifier, scanner,start, scanner->current);
 
     return;
 }
@@ -193,7 +166,7 @@ void report_scanner_error(uint8_t *identifer, int line, int column)
     printf("Error:Unexpected Token %s\n at  line %d column %d", identifer, line, column);
     exit(1);
 }
-uint8_t *get_string(scanner_t *scanner)
+uint8_t scan_string(scanner_t *scanner)
 {
     int start = scanner->current;
     while (scanner->source[scanner->current + 1] != '"')
@@ -201,14 +174,13 @@ uint8_t *get_string(scanner_t *scanner)
         move(scanner);
         if (scanner->source[scanner->current + 1] == '\n')
             ((*scanner).line)++;
-            // scanner->column = 0;
     }
     move(scanner);
-    uint8_t * string = (uint8_t *)teriyaki_malloc(scanner->current + 1 + 1 - start);
+    uint8_t *string = (uint8_t *)teriyaki_malloc(scanner->current + 1 + 1 - start);
     memset(string, '\0', scanner->current + 1 + 1 - start);
-    memcpy(string, &scanner->source[start], (int)(scanner->current + 1  - start));
+    memcpy(string, &scanner->source[start], (int)(scanner->current + 1 - start));
     printf("start:%d\tcyurrent:%d\ttext:%s\n", start, scanner->current + 1, string);
-    return string;
+    add_token_with_lexeme(STRING, string, scanner, start, scanner->current);
 }
 
 void scan_token(scanner_t *scanner)
@@ -294,23 +266,19 @@ void scan_token(scanner_t *scanner)
         (scanner->column) = 0;
         break;
     case '"':
-    {
-        
-        uint8_t * lexeme = get_string(scanner);
-        add_token_with_lexeme(STRING, lexeme, scanner);
-        free(lexeme);
+        scan_string(scanner);
         break;
-    }
+
     default:
 
         if (is_number(scanner->source[scanner->current]))
         {
-            p_number(scanner);
+            scan_number(scanner);
             break;
         }
         else if (is_alpha(scanner->source[scanner->current]))
         {
-            p_identifier(scanner);
+            scan_identifier(scanner);
             break;
         }
         else

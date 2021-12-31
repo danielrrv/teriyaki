@@ -37,6 +37,8 @@
 		
 		STRING,
 		NUMBER,
+		BOOLEAN,
+
 
 		// Keywords.
 		AND,

@@ -1,6 +1,6 @@
 #ifndef INIT_H_
 #define INIT_H_
-#include "scanner.h"
+#include "lexer.h"
 
 
 
