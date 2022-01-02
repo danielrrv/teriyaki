@@ -5,6 +5,8 @@
 	{
 		// Single-character tokens.
 		IDENTIFIER,
+		TAB,
+		SPACE,
 		LEFT_PAREN,
 		RIGHT_PAREN,
 		LEFT_BRACE,
@@ -58,5 +60,18 @@
 		VAR,
 		WHILE,
 		CONST,
+		//My reserved words
+		BE,
+		AS,
+		BEING,
+		OTHERWISE,
+		IN,
+		OBJECT,
+		MANY,
+		OF,
 	} TOKEN_TYPE;
+
+
+
+void print_token(TOKEN_TYPE token);
 #endif /*_TOKEN_TYPE_*/

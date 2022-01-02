@@ -41,9 +41,12 @@ keyworkd_t keywords[] = {
     {(uint8_t *)"for", FOR},
     {(uint8_t *)"while", WHILE},
     {(uint8_t *)"if", IF},
+     {(uint8_t *)"be", BE},
     {(uint8_t *)"for", FOR},
     {(uint8_t *)"while", WHILE},
-    {(uint8_t *)"class", CLASS},
+    {(uint8_t *)"Object", OBJECT},
+    {(uint8_t *)"being", BEING},
+    {(uint8_t *)"otherwise", OTHERWISE},
     {(uint8_t *)"const", CONST},
     {(uint8_t *)"or", OR},
     {(uint8_t *)"and", AND}};
@@ -257,8 +260,13 @@ void scan_token(scanner_t *scanner)
         }
         break;
     case ' ':
-    case '\r':
+        add_token(SPACE, scanner);
+        break;
     case '\t':
+        add_token(TAB, scanner);
+        break;
+    case '\r':
+    
         // Ignore whitespace.
         break;
     case '\n':
