@@ -21,9 +21,9 @@ cometPeriod as Number be 23234
 ### Object declaration
 ```ruby
 Object PostalCode has
-	address String
-	country String
-	code Number
+  address String
+  country String
+  code Number
 end
 
 Object Citizen  has
