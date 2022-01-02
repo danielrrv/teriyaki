@@ -64,7 +64,7 @@ end
 
 func determinePostalCode address as String, country as String returns Number, Boolean do
 	being postalCode of postalCodes do
-		being address in code address do
+		being address in postalCode address do
 			return code in postalCode
 		being otherwise country in postalCode country do
 			return code in postalCode
