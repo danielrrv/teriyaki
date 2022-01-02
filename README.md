@@ -20,10 +20,10 @@ cometPeriod as Number be 23234
 
 ### Object declaration
 ```ruby
-Object PostalCode has
-  address String
-  country String
-  code Number
+Object ZipCode has
+  address as String
+  country as String
+  code as Number
 end
 
 Object Citizen  has
@@ -42,9 +42,9 @@ end
 ```ruby
 
 canadian as Citizen is
-  socialNumber as 000000012,
-  address as "4532 Rue St. Catherine",
-  country as "canada",
+  socialNumber 000000012,
+  address "4532 Rue St. Catherine",
+  country "canada",
 end
 ```
 
@@ -52,9 +52,9 @@ end
 
 ```ruby
 
-postalCodes of PostalCode are
-  PostalCode{"2434 Rue st.Denis","canada", 2345}
-  PostalCode{"Carrera 64 #24-43, Barranquilla, Colombia","Colombia",  5000001}
+postalCodes of ZipCode are
+  ZipCode{"2434 Rue st.Denis","canada", 2345}
+  ZipCode{"Carrera 64 #24-43, Barranquilla, Colombia","Colombia",  5000001}
 end
 ```
 
@@ -62,15 +62,15 @@ end
 
 ```ruby
 
-func determinePostalCode address as String, country as String returns Number, Boolean do
-	being postalCode of postalCodes do
-		being address in postalCode address do
-			return code in postalCode
-		being otherwise country in postalCode country do
-			return code in postalCode
-		otherwise do
-			return -1, false
-	end
+func determineZipCode address as String, country as String returns Number, Boolean do
+  being postalCode of postalCodes do
+    being address in postalCode address do
+      return code in postalCode
+    being otherwise country in postalCode country do
+      return code in postalCode
+   otherwise do
+     return -1, false
+  end
 end
 
 
