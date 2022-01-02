@@ -1,0 +1,142 @@
+
+
+EXPRESSION -> CONDITION | FUNCTION_CALLABLE | NUMBER | STRING | EXPRESSION
+
+
+##=======variable declaration=====================##
+
+IDENTIFIER as IDENTIFIER be EXPRESSION
+
+##===========Function===============================##
+
+// Function declaration
+func IDENTIFIER IDENTIFIER as Number, IDENTIFIER as String returns Number, Number do
+  EXPRESSION
+  RETURN 
+end
+
+IDENTIFIER  be func FUNCTION_NAME ARGUMENT1, ARGUMENT2 returns IDENTIFIER, IDENTIFIER do
+  EXPRESSION
+  RETURN
+end
+//Function calling
+
+FUNCTION_NAME  ARGUMENT1, ARGUMENT2, ARGUMENT3
+main  argument1, argument2, argument3
+
+index, movie_1 be  main argument1, argument2, argument3
+
+##===================Object======================##
+
+Object Person has
+  name as String
+end
+
+//Object definition
+Object Movie has
+  id as Number,
+  director as Object,
+  country as String,
+  year Integer,
+end
+
+
+////PHASE 2
+
+implementation getYear ARGUMENT1, ARGUMENT2 for m as Movie do
+  EXPRESSION
+  RETURN 
+end
+
+////PHASE 2
+
+
+
+
+director as Person is
+  name "Carlos Alberto"
+end
+
+//Declare variable as Object #1
+star_wars as Movie is
+    id be 1243
+    director be director
+    country be "Canada"
+    2022
+end
+
+
+//Object modification
+id in star_wars2 100001
+
+
+
+##==========================Array=======================##
+//Array definition
+moviesViewed of Movie are
+  Movie{12, "QUien sabe","Cclombia", 2013}, 
+  Movie{12, "QUien sabe", "Cclombia", 2013},
+  Movie{12, "QUien sabe", "Cclombia", 2013},
+  Movie{12, "QUien sabe", "Cclombia", 2013}
+end
+
+multiple_objects of Number be Many(1, 23, 4, 5, 6)
+
+myArray of Movie
+
+
+
+
+//========================If clousure
+being EXPRESSION<CONDITION> do:
+  EXPRESSION
+otherwise being EXPRESSION<CONDITION> do:
+otherwise do:
+
+
+being country in star_wars "canada" do:
+  country in star_wars be "Quebec"
+otherwise being id in star_war > 0 do:
+//else clousure  
+otherwise do:
+
+
+
+//========================Case clousure
+
+case EXPRESSION :
+  being EXPRESSION<CONDITION> do:
+  being EXPRESSION<CONDITION> do:
+  default do:
+
+case name in director in star_wars:
+  being "su mama" do:
+    pass
+  being "Ahora quien" do:
+    pass
+  being "eleno" do:
+    pass
+  default do:
+    pass 
+
+
+//===================================For loop
+//Asumo que es iter es Number
+being iter = 0, iter > 5, iter++ do:
+  print iter
+
+being ITER, CONDITION, COUNTER do:
+  EXPRESSION
+
+
+
+//====================================while
+
+
+being 
+
+
+
+
+
+
