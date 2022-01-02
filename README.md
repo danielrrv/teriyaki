@@ -75,8 +75,8 @@ end
 
 
 func moveCitizen citizen as Citizen do
-	being country in citizen not "Palestine" do
-		country in citizen be "Canada"
+  being country in citizen "Palestine" do
+    country in citizen be "Canada"
 end
 
 ```
