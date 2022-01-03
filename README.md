@@ -65,9 +65,9 @@ end
 func determineZipCode address as String, country as String returns Number, Boolean do
   being postalCode of postalCodes do
     being address in postalCode address do
-      return code in postalCode
+      return code in postalCode, true
     being otherwise country in postalCode country do
-      return code in postalCode
+      return code in postalCode, true
    otherwise do
      return -1, false
   end
