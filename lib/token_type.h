@@ -6,7 +6,7 @@
 		// Single-character tokens.
 		IDENTIFIER,
 		TAB,
-		SPACE,
+		// SPACE,
 		LEFT_PAREN,
 		RIGHT_PAREN,
 		LEFT_BRACE,
@@ -23,6 +23,7 @@
 		INTERROGATION,
 		AMPERSAND,
 		NUMERAL,
+		NEW_LINE,
 
 		// One or two character tokens.
 		BANG,
@@ -34,6 +35,7 @@
 		LESS,
 		LESS_EQUAL,
 		PERCENT,
+		PIPE,
 
 		// Literals.
 		
@@ -69,6 +71,14 @@
 		OBJECT,
 		MANY,
 		OF,
+		END,
+		END_OF_FILE,
+
+		//Expression
+		UNARY,
+		BINARY,
+		GROUPING,
+		ASSIGNMENT
 	} TOKEN_TYPE;
 
 

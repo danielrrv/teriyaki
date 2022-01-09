@@ -1,9 +1,7 @@
 
 
-EXPRESSION -> CONDITION | FUNCTION_CALLABLE | NUMBER | STRING | EXPRESSION
 
 
-##=======variable declaration=====================##
 
 IDENTIFIER as IDENTIFIER be EXPRESSION
 

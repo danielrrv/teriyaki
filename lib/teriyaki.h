@@ -1,6 +1,7 @@
 #ifndef INIT_H_
 #define INIT_H_
 #include "lexer.h"
+#include "parse.h"
 
 
 
@@ -36,7 +37,8 @@ void run_file(uint8_t *source)
 {
 	uint8_t * out = read_file(source);
 	scanner_t *scanner = _scanner(out);
-	scan(scanner);
+	token_t ** tokens = scan(scanner);
+	parse(tokens);
 }
 
 uint8_t * read_file(uint8_t * source){

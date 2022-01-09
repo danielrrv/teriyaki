@@ -37,11 +37,12 @@ typedef struct Keyword
 } keyworkd_t;
 
 keyworkd_t keywords[] = {
+    {(uint8_t *)"true", TRUE},
+    {(uint8_t *)"false", FALSE},
     {(uint8_t *)"if", IF},
     {(uint8_t *)"for", FOR},
     {(uint8_t *)"while", WHILE},
-    {(uint8_t *)"if", IF},
-     {(uint8_t *)"be", BE},
+    {(uint8_t *)"be", BE},
     {(uint8_t *)"for", FOR},
     {(uint8_t *)"while", WHILE},
     {(uint8_t *)"Object", OBJECT},
@@ -49,7 +50,8 @@ keyworkd_t keywords[] = {
     {(uint8_t *)"otherwise", OTHERWISE},
     {(uint8_t *)"const", CONST},
     {(uint8_t *)"or", OR},
-    {(uint8_t *)"and", AND}};
+    {(uint8_t *)"and", AND},
+    {(uint8_t *)"as", AS}};
 
 scanner_t *_scanner(const char *source)
 {
@@ -64,14 +66,14 @@ scanner_t *_scanner(const char *source)
     return scanner;
 }
 
-bool is_at_end(const scanner_t *scanner)
+static bool is_at_end_lexer(const scanner_t *scanner)
 {
     return (scanner->current >= strlen((char *)scanner->source));
 }
 
-bool move(scanner_t *scanner)
+static bool move_lexer(scanner_t *scanner)
 {
-    if (is_at_end(scanner))
+    if (is_at_end_lexer(scanner))
     {
         return false;
     }
@@ -80,12 +82,12 @@ bool move(scanner_t *scanner)
     return true;
 }
 
-uint8_t char_at_current(scanner_t *scanner)
+static uint8_t char_at_current(scanner_t *scanner)
 {
     return (uint8_t)scanner->source[scanner->current];
 }
 
-void add_token(TOKEN_TYPE token_type, scanner_t *scanner)
+static void add_token(TOKEN_TYPE token_type, scanner_t *scanner)
 {
     token_t *token = c_token(token_type, NULL, scanner->line, scanner->current, scanner->column + 1);
     token_t **new_ptr = (token_t **)realloc(scanner->tokens, (scanner->token_length + 1) * sizeof(token_t));
@@ -94,7 +96,7 @@ void add_token(TOKEN_TYPE token_type, scanner_t *scanner)
     (scanner->token_length)++;
 }
 
-void add_token_with_lexeme(TOKEN_TYPE token_type, uint8_t *lexeme, scanner_t *scanner, int start, int end)
+static void add_token_with_lexeme(TOKEN_TYPE token_type, uint8_t *lexeme, scanner_t *scanner, int start, int end)
 {
     token_t *token = c_token(token_type, lexeme, scanner->line, start, end);
     token_t **new_ptr = (token_t **)realloc(scanner->tokens, (scanner->token_length + 1) * sizeof(token_t));
@@ -115,36 +117,36 @@ static bool is_alpha(uint8_t c)
            c == '_';
 }
 
-void scan_number(scanner_t *scanner)
+static void scan_number(scanner_t *scanner)
 {
     int start = scanner->current;
     while (is_digit(scanner->source[scanner->current]))
-        move(scanner);
-    if (scanner->source[scanner->current] == '.' && move(scanner))
+        move_lexer(scanner);
+    if (scanner->source[scanner->current] == '.' && move_lexer(scanner))
     {
-        while (is_digit(scanner->source[scanner->current]) && move(scanner))
+        while (is_digit(scanner->source[scanner->current]) && move_lexer(scanner))
             ;
     }
-    uint8_t * number = (uint8_t *)teriyaki_malloc((scanner->current - start + 1)* sizeof(uint8_t));
+    uint8_t *number = (uint8_t *)teriyaki_malloc((scanner->current - start + 1) * sizeof(uint8_t));
     memcpy(number, &scanner->source[scanner->current], scanner->current - start);
     add_token_with_lexeme(NUMBER, number, scanner, start, scanner->current);
 }
-bool is_number(uint8_t number)
+static bool is_number(uint8_t number)
 {
     return number >= '0' && number <= '9';
 }
 
-bool is_alpha_numeric(const uint8_t c)
+static bool is_alpha_numeric(const uint8_t c)
 {
     return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || is_number(c) || c == '_');
 }
 
-void scan_identifier(scanner_t *scanner)
+static void scan_identifier(scanner_t *scanner)
 {
     int start = scanner->current;
     while (is_alpha_numeric(scanner->source[scanner->current + 1]))
     {
-        move(scanner);
+        move_lexer(scanner);
     }
     uint8_t *identifier = (uint8_t *)teriyaki_malloc((scanner->current + 1 + 1 - start) * sizeof(uint8_t));
     memset(identifier, '\0', scanner->current + 1 + 1 - start);
@@ -155,16 +157,17 @@ void scan_identifier(scanner_t *scanner)
         int rx = strncmp((char *)identifier, (char *)keywords[i].name, strlen((char *)identifier));
         if (rx == 0)
         {
+            // printf("keyword:%s, %d\n", keywords[i].name, keywords[i].kind);
             add_token_with_lexeme(keywords[i].kind, keywords[i].name, scanner, start, scanner->current);
             return;
         }
     }
-    add_token_with_lexeme(IDENTIFIER, identifier, scanner,start, scanner->current);
+    add_token_with_lexeme(IDENTIFIER, identifier, scanner, start, scanner->current);
 
     return;
 }
 
-void report_scanner_error(uint8_t *identifer, int line, int column)
+static void report_scanner_error(uint8_t *identifer, int line, int column)
 {
     printf("Error:Unexpected Token %s\n at  line %d column %d", identifer, line, column);
     exit(1);
@@ -174,20 +177,21 @@ uint8_t scan_string(scanner_t *scanner)
     int start = scanner->current;
     while (scanner->source[scanner->current + 1] != '"')
     {
-        move(scanner);
+        move_lexer(scanner);
         if (scanner->source[scanner->current + 1] == '\n')
             ((*scanner).line)++;
     }
-    move(scanner);
+    move_lexer(scanner);
     uint8_t *string = (uint8_t *)teriyaki_malloc(scanner->current + 1 + 1 - start);
     memset(string, '\0', scanner->current + 1 + 1 - start);
     memcpy(string, &scanner->source[start], (int)(scanner->current + 1 - start));
-    printf("start:%d\tcyurrent:%d\ttext:%s\n", start, scanner->current + 1, string);
+    // printf("start:%d\tcyurrent:%d\ttext:%s\n", start, scanner->current + 1, string);
     add_token_with_lexeme(STRING, string, scanner, start, scanner->current);
 }
 
-void scan_token(scanner_t *scanner)
+static void scan_token(scanner_t *scanner)
 {
+    printf("char:%d\n", scanner->source[scanner->current]);
     switch (scanner->source[scanner->current])
     {
     case '(':
@@ -244,6 +248,9 @@ void scan_token(scanner_t *scanner)
     case '>':
         add_token(scanner->source[scanner->current + 1] == '=' ? GREATER_EQUAL : GREATER, scanner);
         break;
+    case '|':
+        add_token(PIPE, scanner);
+        break;
     case '%':
         add_token(PERCENT, scanner);
         break;
@@ -251,25 +258,27 @@ void scan_token(scanner_t *scanner)
         if (scanner->source[scanner->current + 1] == '/')
         {
             // A comment goes until the end of the line.
-            while (scanner->source[scanner->current] != '\n' && !is_at_end(scanner))
-                move(scanner);
+            while (scanner->source[scanner->current] != '\n' && !is_at_end_lexer(scanner))
+                move_lexer(scanner);
         }
         else
         {
             add_token(SLASH, scanner);
         }
         break;
-    case ' ':
-        add_token(SPACE, scanner);
-        break;
+    // case ' ':
+    //     add_token(SPACE, scanner);
+    //     break;
     case '\t':
         add_token(TAB, scanner);
         break;
+    case ' ':
     case '\r':
-    
+
         // Ignore whitespace.
         break;
     case '\n':
+        add_token(NEW_LINE, scanner);
         (scanner->line)++;
         (scanner->column) = 0;
         break;
@@ -298,16 +307,22 @@ void scan_token(scanner_t *scanner)
             exit(1);
         }
     }
-    move(scanner);
+    move_lexer(scanner);
 }
 
-void scan(scanner_t *scanner)
+token_t **scan(scanner_t *scanner)
 {
-    while (!is_at_end(scanner))
+    while (!is_at_end_lexer(scanner))
     {
         char character = scanner->source[scanner->current];
         scan_token(scanner);
     }
+    token_t *end_of_file = c_token(END_OF_FILE, NULL, scanner->line, scanner->current, scanner->current);
+    token_t **new_ptrs = (token_t **)realloc(scanner->tokens, (scanner->token_length + 1) * sizeof(token_t));
+    new_ptrs[scanner->token_length] = end_of_file;
+    scanner->tokens = new_ptrs;
+    (scanner->token_length)++;
+    return scanner->tokens;
 }
 
 #endif // SCANNER_H_

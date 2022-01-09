@@ -11,7 +11,7 @@ Simple interpreter written in C
 
 isCold as Boolean be false
 
-Address as String be "2123 H2L New York"
+address as String be "2123 H2L New York"
 
 cometPeriod as Number be 23234
 
