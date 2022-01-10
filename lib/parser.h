@@ -143,6 +143,24 @@ expression_t *equality(parser_t *parser, expression_t *expression)
 	return expression;
 }
 
+expression_t * and( parser_t * parser, expression_t * expression){
+
+
+
+	return expression;
+}
+
+expression_t * or( parser_t * parser, expression_t * expression){
+
+	expression = and(parser, expression);
+	move(parser);
+	if(match(OR)){
+		expression->kind = BINARY;
+		memcpy(expression->binary_expr)
+	}
+	return expression;
+}
+
 void assignment_operation(parser_t *parser)
 {
 
@@ -166,8 +184,7 @@ void assignment_operation(parser_t *parser)
 
 	printf("value: %s\n", expr->assignment.right->literal_expr.value);
 	consume(NEW_LINE, parser, (uint8_t *)"Expected '\\n' token\n");
-	add_new_expr(parser, expr);
-	return;
+	// add_new_expr(parser, expr);
 }
 
 static void evaluate(parser_t *parser)
@@ -190,11 +207,11 @@ static void evaluate(parser_t *parser)
 
 void parse(token_t **tokens)
 {
-	parser_t parser;
-	parser.current = 0;
-	parser.length_statements = 0;
+	parser_t parser ={
+		.current = 0,
+		.length_statements = 0,
+	};
 	parser.tokens = tokens;
-
 	while (!is_at_end(&parser))
 	{
 		evaluate(&parser);
