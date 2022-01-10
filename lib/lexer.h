@@ -120,15 +120,24 @@ static bool is_alpha(uint8_t c)
 static void scan_number(scanner_t *scanner)
 {
     int start = scanner->current;
-    while (is_digit(scanner->source[scanner->current]))
-        move_lexer(scanner);
-    if (scanner->source[scanner->current] == '.' && move_lexer(scanner))
+    while (is_digit(scanner->source[scanner->current ]))
     {
-        while (is_digit(scanner->source[scanner->current]) && move_lexer(scanner))
-            ;
+        printf("%d\n", scanner->source[scanner->current]);
+        move_lexer(scanner);
+
+        if (scanner->source[scanner->current] == '.')
+        {
+            move_lexer(scanner);
+            while (is_digit(scanner->source[scanner->current])){
+                move_lexer(scanner);
+            }
+        }
     }
-    uint8_t *number = (uint8_t *)teriyaki_malloc((scanner->current - start + 1) * sizeof(uint8_t));
-    memcpy(number, &scanner->source[scanner->current], scanner->current - start);
+    printf("%d\n", (scanner->current+ 1 + 1  - start));
+    uint8_t *number = (uint8_t *)teriyaki_malloc((scanner->current + 1 + 1 - start) * sizeof(uint8_t));
+    memset(number, 'c', scanner->current + 1 + 1 - start);
+    memcpy(number, &scanner->source[start], scanner->current + 1 - start);
+    printf("start:%d\tcurrent:%d\ttext:%s\n", start, scanner->current + 1, number);
     add_token_with_lexeme(NUMBER, number, scanner, start, scanner->current);
 }
 static bool is_number(uint8_t number)
@@ -191,7 +200,6 @@ uint8_t scan_string(scanner_t *scanner)
 
 static void scan_token(scanner_t *scanner)
 {
-    printf("char:%d\n", scanner->source[scanner->current]);
     switch (scanner->source[scanner->current])
     {
     case '(':
