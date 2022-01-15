@@ -24,8 +24,8 @@ token_t *c_token(TOKEN_TYPE kind, uint8_t *lexeme, int line, int start, int end)
     token->kind = kind;
     if (lexeme != NULL)
     {
-        token->lexeme = (uint8_t *)teriyaki_malloc((end - start) * sizeof(uint8_t));
-        memcpy(token->lexeme, lexeme, (end - start) * sizeof(uint8_t));
+        token->lexeme = (uint8_t *)teriyaki_malloc((end + 1 - start) * sizeof(uint8_t));
+        memcpy(token->lexeme, lexeme, (end + 1 - start) * sizeof(uint8_t));
     }
     token->line = line;
     token->start = start;

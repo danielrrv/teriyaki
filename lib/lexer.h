@@ -122,7 +122,6 @@ static void scan_number(scanner_t *scanner)
     int start = scanner->current;
     while (is_digit(scanner->source[scanner->current ]))
     {
-        printf("%d\n", scanner->source[scanner->current]);
         move_lexer(scanner);
 
         if (scanner->source[scanner->current] == '.')
@@ -194,7 +193,7 @@ uint8_t scan_string(scanner_t *scanner)
     uint8_t *string = (uint8_t *)teriyaki_malloc(scanner->current + 1 + 1 - start);
     memset(string, '\0', scanner->current + 1 + 1 - start);
     memcpy(string, &scanner->source[start], (int)(scanner->current + 1 - start));
-    // printf("start:%d\tcyurrent:%d\ttext:%s\n", start, scanner->current + 1, string);
+    printf("start:%d\tcurrent:%d\ttext:%s\n", start, scanner->current + 1, string);
     add_token_with_lexeme(STRING, string, scanner, start, scanner->current);
 }
 

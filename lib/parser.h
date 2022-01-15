@@ -90,10 +90,14 @@ expression_t *primary(parser_t *parser, expression_t *expression)
 		return expression;
 	}
 	if (match(NUMBER, parser) || match(STRING, parser))
-	{
+	{	int  i = 0;
+		while(i<peek(parser)->end - peek(parser)->start){
+			printf("=>%d\n", peek(parser)->lexeme[i]);
+			i++;
+		}
 		expression->literal_expr.value = (uint8_t *)teriyaki_malloc(strlen((char *)peek(parser)->lexeme));
 		memcpy(&expression->literal_expr.token, peek(parser), sizeof(token_t));
-		memcpy(expression->literal_expr.value, peek(parser)->lexeme, strlen((char *)peek(parser)->lexeme));
+		memcpy(expression->literal_expr.value, peek(parser)->lexeme, strlen((char *)peek(parser)->lexeme) + sizeof(uint8_t));
 		return expression;
 	}
 	printf("Expected token:%d\n", peek(parser)->kind);
