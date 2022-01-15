@@ -28,6 +28,7 @@ token_t *c_token(TOKEN_TYPE kind, uint8_t *lexeme, int line, int start, int end)
         memcpy(token->lexeme, lexeme, (end + 1 - start) * sizeof(uint8_t));
     }
     token->line = line;
+    // //Una [ro[iedad]]
     token->start = start;
     token->end = end;
     return token;
