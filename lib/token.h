@@ -29,6 +29,7 @@ token_t *c_token(TOKEN_TYPE kind, uint8_t *lexeme, int line, int start, int end)
     }
     token->line = line;
     token->start = start;
+    ///
     token->end = end;
     return token;
 }
