@@ -30,7 +30,9 @@ token_t *c_token(TOKEN_TYPE kind, uint8_t *lexeme, int line, int start, int end)
     token->line = line;
     // //Una [ro[iedad]]
     token->start = start;
-    ///
+
+    //ddsds
+
     token->end = end;
     return token;
 }
